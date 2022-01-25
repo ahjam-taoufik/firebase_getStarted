@@ -42,7 +42,7 @@ const colRef = collection(db, "books");
 //==============snapshot
 const q = query(colRef, orderBy("createdAt"));
 
-onSnapshot(colRef, (snapshot) => {
+const unsubCol= onSnapshot(colRef, (snapshot) => {
   let books = [];
   snapshot.docs.forEach((doc) => {
     books.push({ ...doc.data(), id: doc.id });
@@ -83,11 +83,11 @@ deleteBookForm.addEventListener("submit", (e) => {
 //         console.log(doc.data(),doc.id);
 //     })
 
-//  get a single document in real time change
-//     const docRef=doc(db, 'books' , 'JfBuBC8BF2QesTYXFA65')
-// onSnapshot(docRef,(doc)=>{
-//     console.log(doc.data(),doc.id);
-// })
+ //get a single document in real time change
+    const docRef=doc(db, 'books' , 'JfBuBC8BF2QesTYXFA65')
+const unsubDoc=onSnapshot(docRef,(doc)=>{
+    console.log(doc.data(),doc.id);
+})
 
 //updating a document
 const updateForm = document.querySelector(".update");
@@ -115,7 +115,7 @@ signupForm.addEventListener('submit', (e) => {
     .then(cred => {
      // console.log(cred)
      // console.log('==============================')
-    //  console.log('user created:', cred.user)
+      console.log('user created:', cred.user)
       signupForm.reset()
     })
     .catch(err => {
@@ -144,7 +144,7 @@ loginForm.addEventListener('submit', (e) => {
 
   signInWithEmailAndPassword(auth, email, password)
     .then(cred => {
-    //  console.log('user logged in:', cred.user)
+     console.log('user logged in:', cred.user)
       loginForm.reset()
     })
     .catch(err => {
@@ -153,8 +153,17 @@ loginForm.addEventListener('submit', (e) => {
 })
 
 // subscribing to auth changes
-onAuthStateChanged(auth, (user) => {
+ const unsubAuth= onAuthStateChanged(auth, (user) => {
     console.log('user status changed:', user)
   })
+
+  // unsubscribing from changes (auth & db)
+const unsubButton = document.querySelector('.unsub')
+unsubButton.addEventListener('click', () => {
+  console.log('unsubscribing')
+  unsubCol()
+  unsubDoc()
+  unsubAuth()
+})
 
 
