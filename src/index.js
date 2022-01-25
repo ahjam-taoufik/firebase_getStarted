@@ -8,7 +8,8 @@ import {
     deleteDoc,
     doc,
     query,
-    where
+    where,
+    orderBy,
 } from 'firebase/firestore'
 
 const firebaseConfig = {
@@ -28,7 +29,7 @@ const db=getFirestore()
 const colRef=collection(db,'books')
 
 //==============snapshot
-const q=query(colRef,where('author', '==', 'taoufik'))
+const q=query(colRef,where('author','==','taoufik'),orderBy('title','asc'))
 
 
 onSnapshot(q,(snapshot)=>{
@@ -41,7 +42,7 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-  // adding docs
+  //adding docs
 const addBookForm = document.querySelector('.add')
 addBookForm.addEventListener('submit', (e) => {
   e.preventDefault()
@@ -49,13 +50,14 @@ addBookForm.addEventListener('submit', (e) => {
   addDoc(colRef, {
     title: addBookForm.title.value,
     author: addBookForm.author.value,
+    
   })
   .then(() => {
     addBookForm.reset()
   })
 })
 
-// deleting docs
+ // deleting docs
 const deleteBookForm = document.querySelector('.delete')
 deleteBookForm.addEventListener('submit', (e) => {
   e.preventDefault()
