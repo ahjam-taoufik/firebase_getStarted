@@ -1,76 +1,77 @@
-import {initializeApp} from 'firebase/app'
+import { initializeApp } from "firebase/app";
 
 import {
-    getFirestore,
-    collection,
-    onSnapshot,
-    addDoc,
-    deleteDoc,
-    doc,
-    query,
-    where,
-    orderBy,
-    serverTimestamp,
-    getDoc,
-    updateDoc
-} from 'firebase/firestore'
+  getFirestore,
+  collection,
+  onSnapshot,
+  addDoc,
+  deleteDoc,
+  doc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
+
+import {
+     getAuth,
+     createUserWithEmailAndPassword
+    } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDPw_JVrNqeWpGpDUfWRZ1_bbjfPisF5dc",
-    authDomain: "fir-basics-github-tfk-5387f.firebaseapp.com",
-    projectId: "fir-basics-github-tfk-5387f",
-    storageBucket: "fir-basics-github-tfk-5387f.appspot.com",
-    messagingSenderId: "335320390985",
-    appId: "1:335320390985:web:781a260f2f6d163c1a0e98"
-  };
+  apiKey: "AIzaSyDPw_JVrNqeWpGpDUfWRZ1_bbjfPisF5dc",
+  authDomain: "fir-basics-github-tfk-5387f.firebaseapp.com",
+  projectId: "fir-basics-github-tfk-5387f",
+  storageBucket: "fir-basics-github-tfk-5387f.appspot.com",
+  messagingSenderId: "335320390985",
+  appId: "1:335320390985:web:781a260f2f6d163c1a0e98",
+};
 
-  initializeApp(firebaseConfig)
+initializeApp(firebaseConfig);
 
+const db = getFirestore();
+const auth = getAuth();
 
-const db=getFirestore()
-
-const colRef=collection(db,'books')
+const colRef = collection(db, "books");
 
 //==============snapshot
-const q=query(colRef,orderBy('createdAt'))
+const q = query(colRef, orderBy("createdAt"));
 
-onSnapshot(colRef,(snapshot)=>{
-    let books=[]
-    snapshot.docs.forEach((doc)=>{
-        books.push({...doc.data(), id:doc.id})
-    })
-    console.log(books);
-})
+onSnapshot(colRef, (snapshot) => {
+  let books = [];
+  snapshot.docs.forEach((doc) => {
+    books.push({ ...doc.data(), id: doc.id });
+  });
+  console.log(books);
+});
 
-
-
-  //adding docs
-const addBookForm = document.querySelector('.add')
-addBookForm.addEventListener('submit', (e) => {
-  e.preventDefault()
+//adding docs
+const addBookForm = document.querySelector(".add");
+addBookForm.addEventListener("submit", (e) => {
+  e.preventDefault();
 
   addDoc(colRef, {
     title: addBookForm.title.value,
     author: addBookForm.author.value,
-    createdAt:serverTimestamp()
-  })
-  .then(() => {
-    addBookForm.reset()
-  })
-})
+    createdAt: serverTimestamp(),
+  }).then(() => {
+    addBookForm.reset();
+  });
+});
 
- // deleting docs
-const deleteBookForm = document.querySelector('.delete')
-deleteBookForm.addEventListener('submit', (e) => {
-  e.preventDefault()
+// deleting docs
+const deleteBookForm = document.querySelector(".delete");
+deleteBookForm.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-  const docRef = doc(db, 'books', deleteBookForm.id.value)
+  const docRef = doc(db, "books", deleteBookForm.id.value);
 
-  deleteDoc(docRef)
-    .then(() => {
-      deleteBookForm.reset()
-    })
-})
+  deleteDoc(docRef).then(() => {
+    deleteBookForm.reset();
+  });
+});
 
 //get a single document
 // const docRef=doc(db, 'books' , 'JfBuBC8BF2QesTYXFA65')
@@ -78,27 +79,43 @@ deleteBookForm.addEventListener('submit', (e) => {
 // .then((doc)=>{
 //         console.log(doc.data(),doc.id);
 //     })
-    
-  //  get a single document in real time change
+
+//  get a single document in real time change
 //     const docRef=doc(db, 'books' , 'JfBuBC8BF2QesTYXFA65')
 // onSnapshot(docRef,(doc)=>{
 //     console.log(doc.data(),doc.id);
 // })
 
-
 //updating a document
-const updateForm = document.querySelector('.update')
-updateForm.addEventListener('submit', (e) => {
-    e.preventDefault()
-  
-    const docRef = doc(db, 'books', updateForm.id.value)
-  
-    updateDoc(docRef,{
-        title: 'apdated title'
+const updateForm = document.querySelector(".update");
+updateForm.addEventListener("submit", (e) => {
+  e.preventDefault();
 
+  const docRef = doc(db, "books", updateForm.id.value);
+
+  updateDoc(docRef, {
+    title: "apdated title",
+  }).then(() => {
+    updateForm.reset();
+  });
+});
+
+// signUp users
+const signupForm = document.querySelector('.signup')
+signupForm.addEventListener('submit', (e) => {
+  e.preventDefault()
+
+  const email = signupForm.email.value
+  const password = signupForm.password.value
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(cred => {
+      console.log(cred)
+      console.log('==============================')
+      console.log('user created:', cred.user)
+      signupForm.reset()
     })
-      .then(() => {
-        updateForm.reset()
-      })
-  })
-  
+    .catch(err => {
+      console.log(err.message)
+    })
+})
